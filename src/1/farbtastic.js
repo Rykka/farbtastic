@@ -226,10 +226,6 @@
 		 * Initialize the color picker widget
 		 */
 		fb.initWidget = function () {
-			// Dimensions
-			fb.radius = 84;
-			fb.square = 100;
-
 			// Insert markup
 			$(container).html('<div class="farbtastic">' +
 				'<div class="color"></div>' +
@@ -239,6 +235,11 @@
 				'<div class="sl-marker marker"></div>' +
 				'</div>'
 				);
+
+			// Determine layout
+			fb.radius = 84;
+			fb.square = 100;
+			fb.mid = Math.floor(options.width / 2);
 
 			e_fb = $(".farbtastic", container);
 			fb.wheel = $(".wheel", container)[0];
@@ -271,13 +272,13 @@
 				y2 = fb.square * (0.5 - fb.hsl[2]);
 
 			$(".h-marker", e_fb).css({
-				left: Math.round(x1 + options.width / 2) + "px",
-				top: Math.round(y1 + options.width / 2) + "px"
+				left: Math.round(x1 + fb.mid) + "px",
+				top: Math.round(y1 + fb.mid) + "px"
 			});
 
 			$(".sl-marker", e_fb).css({
-				left: Math.round(x2 + options.width / 2) + "px",
-				top: Math.round(y2 + options.width / 2) + "px"
+				left: Math.round(x2 + fb.mid) + "px",
+				top: Math.round(y2 + fb.mid) + "px"
 			});
 		};
 
@@ -314,14 +315,12 @@
 		};
 
 		/**
-		 * Retrieve the coordinates of the given event relative to the center
-		 * of the widget.
+		 * Helper for returning coordinates relative to the center
 		 */
 		fb.widgetCoords = function (event) {
-			var offset = $(fb.wheel).offset();
 			return {
-				x: (event.pageX - offset.left) - options.width / 2,
-				y: (event.pageY - offset.top) - options.width / 2
+				x: event.pageX - fb.offset.left - fb.mid,
+				y: event.pageY - fb.offset.top - fb.mid
 			};
 		};
 
@@ -334,6 +333,9 @@
 				$(document).bind("mousemove.farbtastic", fb.mousemove).bind("mouseup.farbtastic", fb.mouseup);
 				document.dragging = true;
 			}
+
+			// Update the stored offset for the widget
+			fb.offset = $(fb.wheel).offset();
 
 			// Check which area is being dragged
 			var pos = fb.widgetCoords(event);

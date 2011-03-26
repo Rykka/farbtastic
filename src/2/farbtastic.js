@@ -516,7 +516,7 @@
 		};
 
 		/**
-		 * Helper for returning coordinates relative to the center.
+		 * Helper for returning coordinates relative to the center
 		 */
 		fb.widgetCoords = function (event) {
 			return {
