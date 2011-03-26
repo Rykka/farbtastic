@@ -11,7 +11,7 @@ $.fn.farbtastic = function (options) {
 $.farbtastic = function (container, options) {
   var container = $(container)[0];
   return container.farbtastic || (container.farbtastic = new $._farbtastic(container, options));
-}
+};
 
 $._farbtastic = function (container, options) {
   var fb = this;
@@ -42,12 +42,13 @@ $._farbtastic = function (container, options) {
       }
     }
     return this;
-  }
+  };
+
   fb.updateValue = function (event) {
     if (this.value && this.value != fb.color) {
       fb.setColor(this.value);
     }
-  }
+  };
 
   /**
    * Change color with HTML syntax #123456
@@ -61,7 +62,7 @@ $._farbtastic = function (container, options) {
       fb.updateDisplay();
     }
     return this;
-  }
+  };
 
   /**
    * Change color with HSL triplet [0..1, 0..1, 0..1]
@@ -72,7 +73,7 @@ $._farbtastic = function (container, options) {
     fb.color = fb.pack(fb.rgb);
     fb.updateDisplay();
     return this;
-  }
+  };
 
   /////////////////////////////////////////////////////
 
@@ -134,7 +135,7 @@ $._farbtastic = function (container, options) {
     // Draw widget base layers.
     fb.drawCircle();
     fb.drawMask();
-  }
+  };
 
   /**
    * Draw the color wheel.
@@ -289,7 +290,7 @@ $._farbtastic = function (container, options) {
       });
     }    
     __debug && $('body').append('<div>drawMask '+ (+(new Date()) - tm) +'ms');
-  }
+  };
 
   /**
    * Draw the selection markers.
@@ -321,7 +322,7 @@ $._farbtastic = function (container, options) {
       fb.ctxOverlay.arc(c.x, c.y, c.r, 0, Math.PI * 2, true);
       fb.ctxOverlay.stroke();
     }
-  }
+  };
 
   /**
    * Update the markers and styles
@@ -354,7 +355,7 @@ $._farbtastic = function (container, options) {
     else if (typeof fb.callback == 'function') {
       fb.callback.call(fb, fb.color);
     }
-  }
+  };
   
   /**
    * Helper for returning coordinates relative to the center.
@@ -364,7 +365,7 @@ $._farbtastic = function (container, options) {
       x: event.pageX - fb.offset.left - fb.mid,    
       y: event.pageY - fb.offset.top - fb.mid
     };    
-  }
+  };
 
   /**
    * Mousedown handler
@@ -386,7 +387,7 @@ $._farbtastic = function (container, options) {
     // Process
     fb.mousemove(event);
     return false;
-  }
+  };
 
   /**
    * Mousemove handler
@@ -406,7 +407,7 @@ $._farbtastic = function (container, options) {
       fb.setHSL([fb.hsl[0], sat, lum]);
     }
     return false;
-  }
+  };
 
   /**
    * Mouseup handler
@@ -416,12 +417,12 @@ $._farbtastic = function (container, options) {
     $(document).unbind('mousemove', fb.mousemove);
     $(document).unbind('mouseup', fb.mouseup);
     $._farbtastic.dragging = false;
-  }
+  };
 
   /* Various color utility functions */
   fb.dec2hex = function (x) {
     return (x < 16 ? '0' : '') + x.toString(16);
-  }
+  };
 
   fb.packDX = function (c, a) {
     return '#' + fb.dec2hex(a) + fb.dec2hex(c) + fb.dec2hex(c) + fb.dec2hex(c);
@@ -511,6 +512,6 @@ $._farbtastic = function (container, options) {
   }
   // Set to gray.
   fb.setColor('#808080');
-}
+};
 
 })(jQuery);
