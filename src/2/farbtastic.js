@@ -290,10 +290,9 @@
 		 * Draw the color wheel
 		 */
 		fb.drawCircle = function () {
-			var tm = +(new Date()),
-				// Draw a hue circle with a bunch of gradient-stroked beziers.
-				// Have to use beziers, as gradient-stroked arcs don't work.
-				n = 24,
+			// Draw a hue circle with a bunch of gradient-stroked beziers.
+			// Have to use beziers, as gradient-stroked arcs don't work.
+			var n = 24,
 				r = fb.radius,
 				w = options.wheelWidth,
 				nudge = 8 / r / n * Math.PI, // Fudge factor for seams
@@ -357,18 +356,16 @@
 				// Prevent seams where curves join
 				angle1 = angle2 - nudge; color1 = color2; d1 = d2;
 			}
-			m.restore();
 
-			debug && $("body").append("<div>drawCircle " + (+(new Date()) - tm) + "ms");
+			m.restore();
 		};
 
 		/**
 		 * Draw the saturation/luminance mask.
 		 */
 		fb.drawMask = function () {
-			var tm = +(new Date()),
-				// Iterate over sat/lum space and calculate appropriate mask pixel values
-				size = fb.square * 2,
+			// Iterate over sat/lum space and calculate appropriate mask pixel values
+			var size = fb.square * 2,
 				sq = fb.square,
 				sz;
 
@@ -449,8 +446,6 @@
 					cache.push([c, a]);
 				});
 			}
-
-			debug && $("body").append("<div>drawMask " + (+(new Date()) - tm) + "ms");
 		};
 
 		/**
@@ -580,6 +575,24 @@
 			$(document).unbind(".farbtastic");
 			$._farbtastic.dragging = false;
 		};
+
+		if (debug) {
+			var funcsToDebug = ["drawCircle", "drawMask", "initWidget"], i;
+			
+			for (i = 0; i < funcsToDebug.length; i += 1) {
+				(function () {
+					var label = funcsToDebug[i], proxied = fb[label];
+					fb[label] = function () {
+						var tm = +(new Date()), tm2;
+						proxied.apply(this, arguments);
+						tm2 = +(new Date());
+						$("body").append("<div>" + label + ": " + (tm2 - tm) + "ms</div>");
+					};
+				})();
+			}
+
+			$("body").append("<hr/>");
+		}
 
 		fb.init();
 	};
