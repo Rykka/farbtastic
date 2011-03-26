@@ -152,7 +152,7 @@
 				fb.linkTo(options.callback);
 			}
 
-			// Set to gray.
+			// Set to gray
 			fb.setColor("#808080");
 		};
 
@@ -453,14 +453,13 @@
 		 */
 		fb.drawMarkers = function () {
 			// Determine marker dimensions
-			var sz = options.width,
-				lw = Math.ceil(fb.markerSize / 4),
-				r = fb.markerSize - lw + 1,
-				angle = fb.hsl[0] * 6.28,
+			var angle = fb.hsl[0] * 6.28,
 				x1 =  Math.sin(angle) * fb.radius,
 				y1 = -Math.cos(angle) * fb.radius,
 				x2 = 2 * fb.square * (0.5 - fb.hsl[1]),
 				y2 = 2 * fb.square * (0.5 - fb.hsl[2]),
+				lw = Math.ceil(fb.markerSize / 4),
+				r = fb.markerSize - lw + 1,
 				c1 = fb.invert ? "#fff" : "#000",
 				c2 = fb.invert ? "#000" : "#fff",
 				circles = [
@@ -473,7 +472,7 @@
 				c;
 
 			// Update the overlay canvas
-			fb.ctxOverlay.clearRect(-fb.mid, -fb.mid, sz, sz);
+			fb.ctxOverlay.clearRect(-fb.mid, -fb.mid, options.width, options.width);
 			for (i = 0; i < circles.length; i += 1) {
 				c = circles[i];
 				fb.ctxOverlay.lineWidth = c.lw;

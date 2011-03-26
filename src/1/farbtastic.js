@@ -137,13 +137,13 @@
 			// Install mousedown handler (the others are set on the document on-demand)
 			$("*", e).mousedown(fb.mousedown);
 	
-			// Init color
-			fb.setColor("#000000");
-	
 			// Set linked elements/callback
 			if (callback) {
 				fb.linkTo(callback);
 			}
+
+			// Set to gray
+			fb.setColor("#808080");
 		};
 
 		/**
@@ -210,14 +210,22 @@
 		 * Initialize the color picker widget
 		 */
 		fb.initWidget = function () {
-			// Insert markup
-			$(container).html('<div class="farbtastic"><div class="color"></div><div class="wheel"></div><div class="overlay"></div><div class="h-marker marker"></div><div class="sl-marker marker"></div></div>');
-			e = $(".farbtastic", container);
-			fb.wheel = $(".wheel", container).get(0);
 			// Dimensions
 			fb.radius = 84;
 			fb.square = 100;
 			fb.width = 194;
+
+			// Insert markup
+			$(container).html('<div class="farbtastic">' +
+				'<div class="color"></div>' +
+				'<div class="wheel"></div>' +
+				'<div class="overlay"></div>' +
+				'<div class="h-marker marker"></div>' +
+				'<div class="sl-marker marker"></div>' +
+				'</div>'
+			);
+			e = $(".farbtastic", container);
+			fb.wheel = $(".wheel", container).get(0);
 
 			// Fix background PNGs in IE6
 			if (navigator.appVersion.match(/MSIE [0-6]\./)) {
@@ -231,6 +239,57 @@
 						});
 					}
 				});
+			}
+		};
+
+		/**
+		 * Draw the selection markers.
+		 */
+		fb.drawMarkers = function () {
+			var angle = fb.hsl[0] * 6.28,
+				x1 = Math.sin(angle) * fb.radius,
+				y1 = -Math.cos(angle) * fb.radius,
+				x2 = fb.square * (0.5 - fb.hsl[1]),
+				y2 = fb.square * (0.5 - fb.hsl[2]);
+
+			$(".h-marker", e).css({
+				left: Math.round(x1 + fb.width / 2) + "px",
+				top: Math.round(y1 + fb.width / 2) + "px"
+			});
+
+			$(".sl-marker", e).css({
+				left: Math.round(x2 + fb.width / 2) + "px",
+				top: Math.round(y2 + fb.width / 2) + "px"
+			});
+		};
+
+		/**
+		 * Update the markers and styles
+		 */
+		fb.updateDisplay = function () {
+
+			// Draw markers
+			fb.drawMarkers();
+
+			// Saturation/Luminance gradient
+			$(".color", e).css("backgroundColor", $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
+
+			// Linked elements or callback
+			if (typeof fb.callback === "object") {
+				// Set background/foreground color
+				$(fb.callback).css({
+					backgroundColor: fb.color,
+					color: fb.hsl[2] > 0.5 ? "#000" : "#fff"
+				});
+
+				// Change linked value
+				$(fb.callback).each(function () {
+					if (this.value && this.value !== fb.color) {
+						this.value = fb.color;
+					}
+				});
+			} else if (typeof fb.callback === "function") {
+				fb.callback.call(fb, fb.color);
 			}
 		};
 
@@ -291,44 +350,6 @@
 			$(document).unbind("mousemove", fb.mousemove);
 			$(document).unbind("mouseup", fb.mouseup);
 			document.dragging = false;
-		};
-
-		/**
-		 * Update the markers and styles
-		 */
-		fb.updateDisplay = function () {
-			// Markers
-			var angle = fb.hsl[0] * 6.28;
-			$(".h-marker", e).css({
-				left: Math.round(Math.sin(angle) * fb.radius + fb.width / 2) + "px",
-				top: Math.round(-Math.cos(angle) * fb.radius + fb.width / 2) + "px"
-			});
-
-			$(".sl-marker", e).css({
-				left: Math.round(fb.square * (0.5 - fb.hsl[1]) + fb.width / 2) + "px",
-				top: Math.round(fb.square * (0.5 - fb.hsl[2]) + fb.width / 2) + "px"
-			});
-
-			// Saturation/Luminance gradient
-			$(".color", e).css("backgroundColor", $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
-
-			// Linked elements or callback
-			if (typeof fb.callback === "object") {
-				// Set background/foreground color
-				$(fb.callback).css({
-					backgroundColor: fb.color,
-					color: fb.hsl[2] > 0.5 ? "#000" : "#fff"
-				});
-
-				// Change linked value
-				$(fb.callback).each(function () {
-					if (this.value && this.value !== fb.color) {
-						this.value = fb.color;
-					}
-				});
-			} else if (typeof fb.callback === "function") {
-				fb.callback.call(fb, fb.color);
-			}
 		};
 
 		fb.init();
