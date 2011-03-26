@@ -137,7 +137,7 @@
 
 		fb.init = function () {
 			// Parse options
-			if (!options.callback) {
+			if (options && !options.callback) {
 				options = { callback: options };
 			}
 
