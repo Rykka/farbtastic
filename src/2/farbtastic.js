@@ -1,5 +1,5 @@
 /**
- * Farbtastic 2.0 - jQuery plugin
+ * Farbtastic: jQuery color picker plug-in 2.0a
  * 
  * Farbtastic Color Picker
  * © 2008 Steven Wittens
@@ -60,6 +60,7 @@
 			} else if (typeof callback === "object" || typeof callback === "string") {
 				fb.callback = $(callback);
 				fb.callback.bind("keyup", fb.updateValue);
+
 				if (fb.callback[0].value) {
 					fb.setColor(fb.callback[0].value);
 				}
@@ -527,9 +528,11 @@
 				h = 0,
 				s = 0,
 				l = (min + max) / 2;
+
 			if (l > 0 && l < 1) {
 				s = delta / (l < 0.5 ? (2 * l) : (2 - 2 * l));
 			}
+
 			if (delta > 0) {
 				if (max === r && max !== g) {
 					h += (g - b) / delta;
@@ -542,6 +545,7 @@
 				}
 				h /= 6;
 			}
+
 			return [h, s, l];
 		};
 
