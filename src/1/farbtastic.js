@@ -116,21 +116,26 @@
 		return this;
 	};
 
-	$.farbtastic = function (container, callback) {
+	$.farbtastic = function (container, options) {
 		container = $(container)[0];
 
 		if (!container.farbtastic) {
-			container.farbtastic = new $._farbtastic(container, callback);
+			container.farbtastic = new $._farbtastic(container, options);
 		}
 
 		return container.farbtastic;
 	};
 
-	$._farbtastic = function (container, callback) {
+	$._farbtastic = function (container, options) {
 		// Store farbtastic object
 		var fb = this, e, image;
 
 		fb.init = function () {
+			// Parse options
+			if (!options.callback) {
+				options = { callback: options };
+			}
+
 			// Initialize
 			fb.initWidget();
 
@@ -138,8 +143,8 @@
 			$("*", e).mousedown(fb.mousedown);
 	
 			// Set linked elements/callback
-			if (callback) {
-				fb.linkTo(callback);
+			if (options.callback) {
+				fb.linkTo(options.callback);
 			}
 
 			// Set to gray
