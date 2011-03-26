@@ -262,7 +262,8 @@
 			fb.square = Math.floor((fb.radius - options.wheelWidth / 2) * 0.7) - 1;
 			fb.mid = Math.floor(options.width / 2);
 			fb.markerSize = options.wheelWidth * 0.3;
-			fb.solidFill = $(".farbtastic-solid", container).css({
+
+			fb.solidFill = $(container).find(".farbtastic-solid").css({
 				width: fb.square * 2 - 1,
 				height: fb.square * 2 - 1,
 				left: fb.mid - fb.square,

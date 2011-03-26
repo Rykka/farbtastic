@@ -117,8 +117,8 @@
 	};
 
 	$.farbtastic = function (container, callback) {
-		container = $(container).get(0);
-		
+		container = $(container)[0];
+
 		if (!container.farbtastic) {
 			container.farbtastic = new $._farbtastic(container, callback);
 		}
@@ -165,8 +165,8 @@
 				fb.callback = $(callback);
 				fb.callback.bind("keyup", fb.updateValue);
 
-				if (fb.callback.get(0).value) {
-					fb.setColor(fb.callback.get(0).value);
+				if (fb.callback[0].value) {
+					fb.setColor(fb.callback[0].value);
 				}
 			}
 
@@ -225,7 +225,7 @@
 				'</div>'
 			);
 			e = $(".farbtastic", container);
-			fb.wheel = $(".wheel", container).get(0);
+			fb.wheel = $(".wheel", container)[0];
 
 			// Fix background PNGs in IE6
 			if (navigator.appVersion.match(/MSIE [0-6]\./)) {
@@ -240,6 +240,8 @@
 					}
 				});
 			}
+
+			fb.solidFill = e.find(".color");
 		};
 
 		/**
@@ -247,7 +249,7 @@
 		 */
 		fb.drawMarkers = function () {
 			var angle = fb.hsl[0] * 6.28,
-				x1 = Math.sin(angle) * fb.radius,
+				x1 =  Math.sin(angle) * fb.radius,
 				y1 = -Math.cos(angle) * fb.radius,
 				x2 = fb.square * (0.5 - fb.hsl[1]),
 				y2 = fb.square * (0.5 - fb.hsl[2]);
@@ -267,24 +269,26 @@
 		 * Update the markers and styles
 		 */
 		fb.updateDisplay = function () {
+			// Determine whether labels/markers should invert
+			fb.invert = fb.hsl[2] <= 0.5;
+
+			// Saturation/Luminance gradient
+			fb.solidFill.css("backgroundColor", $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
 
 			// Draw markers
 			fb.drawMarkers();
-
-			// Saturation/Luminance gradient
-			$(".color", e).css("backgroundColor", $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
 
 			// Linked elements or callback
 			if (typeof fb.callback === "object") {
 				// Set background/foreground color
 				$(fb.callback).css({
 					backgroundColor: fb.color,
-					color: fb.hsl[2] > 0.5 ? "#000" : "#fff"
+					color: fb.invert ? "#fff" : "#000"
 				});
 
 				// Change linked value
 				$(fb.callback).each(function () {
-					if (this.value && this.value !== fb.color) {
+					if ((typeof this.value === "string") && this.value !== fb.color) {
 						this.value = fb.color;
 					}
 				});
