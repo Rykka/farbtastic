@@ -129,6 +129,33 @@
 	$._farbtastic = function (container, options) {
 		var fb = this;
 
+		fb.init = function () {
+			// Parse options
+			if (!options.callback) {
+				options = { callback: options };
+			}
+
+			options = $.extend({
+				width: 300,
+				wheelWidth: (options.width || 300) / 10,
+				callback: null
+			}, options);
+
+			// Initialize
+			fb.initWidget();
+
+			// Install mousedown handler (the others are set on the document on-demand)
+			$("canvas.farbtastic-overlay", container).mousedown(fb.mousedown);
+
+			// Set linked elements/callback
+			if (options.callback) {
+				fb.linkTo(options.callback);
+			}
+
+			// Set to gray.
+			fb.setColor("#808080");
+		};
+
 		/////////////////////////////////////////////////////
 
 		/**
@@ -551,29 +578,6 @@
 			$._farbtastic.dragging = false;
 		};
 
-		// Parse options
-		if (!options.callback) {
-			options = { callback: options };
-		}
-
-		options = $.extend({
-			width: 300,
-			wheelWidth: (options.width || 300) / 10,
-			callback: null
-		}, options);
-
-		// Initialize
-		fb.initWidget();
-
-		// Install mousedown handler (the others are set on the document on-demand)
-		$("canvas.farbtastic-overlay", container).mousedown(fb.mousedown);
-
-		// Set linked elements/callback
-		if (options.callback) {
-			fb.linkTo(options.callback);
-		}
-
-		// Set to gray.
-		fb.setColor("#808080");
+		fb.init();
 	};
 })(jQuery);

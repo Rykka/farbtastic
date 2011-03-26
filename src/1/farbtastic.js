@@ -130,28 +130,21 @@
 		// Store farbtastic object
 		var fb = this, e, image;
 
-		// Insert markup
-		$(container).html('<div class="farbtastic"><div class="color"></div><div class="wheel"></div><div class="overlay"></div><div class="h-marker marker"></div><div class="sl-marker marker"></div></div>');
-		e = $(".farbtastic", container);
-		fb.wheel = $(".wheel", container).get(0);
-		// Dimensions
-		fb.radius = 84;
-		fb.square = 100;
-		fb.width = 194;
+		fb.init = function () {
+			// Initialize
+			fb.initWidget();
 
-		// Fix background PNGs in IE6
-		if (navigator.appVersion.match(/MSIE [0-6]\./)) {
-			$("*", e).each(function () {
-				if (this.currentStyle.backgroundImage !== "none") {
-					image = this.currentStyle.backgroundImage;
-					image = this.currentStyle.backgroundImage.substring(5, image.length - 2);
-					$(this).css({
-						"backgroundImage": "none",
-						"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='" + image + "')"
-					});
-				}
-			});
-		}
+			// Install mousedown handler (the others are set on the document on-demand)
+			$("*", e).mousedown(fb.mousedown);
+	
+			// Init color
+			fb.setColor("#000000");
+	
+			// Set linked elements/callback
+			if (callback) {
+				fb.linkTo(callback);
+			}
+		};
 
 		/**
 		 * Link to the given element(s) or callback
@@ -212,6 +205,34 @@
 		};
 
 		/////////////////////////////////////////////////////
+
+		/**
+		 * Initialize the color picker widget
+		 */
+		fb.initWidget = function () {
+			// Insert markup
+			$(container).html('<div class="farbtastic"><div class="color"></div><div class="wheel"></div><div class="overlay"></div><div class="h-marker marker"></div><div class="sl-marker marker"></div></div>');
+			e = $(".farbtastic", container);
+			fb.wheel = $(".wheel", container).get(0);
+			// Dimensions
+			fb.radius = 84;
+			fb.square = 100;
+			fb.width = 194;
+
+			// Fix background PNGs in IE6
+			if (navigator.appVersion.match(/MSIE [0-6]\./)) {
+				$("*", e).each(function () {
+					if (this.currentStyle.backgroundImage !== "none") {
+						image = this.currentStyle.backgroundImage;
+						image = this.currentStyle.backgroundImage.substring(5, image.length - 2);
+						$(this).css({
+							"backgroundImage": "none",
+							"filter": "progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop, src='" + image + "')"
+						});
+					}
+				});
+			}
+		};
 
 		/**
 		 * Retrieve the coordinates of the given event relative to the center
@@ -310,15 +331,6 @@
 			}
 		};
 
-		// Install mousedown handler (the others are set on the document on-demand)
-		$("*", e).mousedown(fb.mousedown);
-
-		// Init color
-		fb.setColor("#000000");
-
-		// Set linked elements/callback
-		if (callback) {
-			fb.linkTo(callback);
-		}
+		fb.init();
 	};
 })(jQuery);
