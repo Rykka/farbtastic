@@ -128,7 +128,15 @@
 
 	$._farbtastic = function (container, options) {
 		// Store farbtastic object
-		var fb = this, e, image;
+		var fb = this,
+			defaults = {
+				callback:	null,
+				version:	1,
+				wheelWidth:	null, // not used in version 1
+				width:		194
+			},
+			e_fb,
+			image;
 
 		fb.init = function () {
 			// Parse options
@@ -136,12 +144,15 @@
 				options = { callback: options };
 			}
 
+			options = $.extend(true, defaults, options);
+			options.wheelWidth = options.width / 10;
+
 			// Initialize
 			fb.initWidget();
 
 			// Install mousedown handler (the others are set on the document on-demand)
-			$("*", e).bind("mousedown.farbtastic", fb.mousedown);
-	
+			$("*", e_fb).bind("mousedown.farbtastic", fb.mousedown);
+
 			// Set linked elements/callback
 			if (options.callback) {
 				fb.linkTo(options.callback);
@@ -218,7 +229,6 @@
 			// Dimensions
 			fb.radius = 84;
 			fb.square = 100;
-			fb.width = 194;
 
 			// Insert markup
 			$(container).html('<div class="farbtastic">' +
@@ -228,13 +238,14 @@
 				'<div class="h-marker marker"></div>' +
 				'<div class="sl-marker marker"></div>' +
 				'</div>'
-			);
-			e = $(".farbtastic", container);
+				);
+
+			e_fb = $(".farbtastic", container);
 			fb.wheel = $(".wheel", container)[0];
 
 			// Fix background PNGs in IE6
 			if (navigator.appVersion.match(/MSIE [0-6]\./)) {
-				$("*", e).each(function () {
+				$("*", e_fb).each(function () {
 					if (this.currentStyle.backgroundImage !== "none") {
 						image = this.currentStyle.backgroundImage;
 						image = this.currentStyle.backgroundImage.substring(5, image.length - 2);
@@ -246,7 +257,7 @@
 				});
 			}
 
-			fb.solidFill = e.find(".color");
+			fb.solidFill = e_fb.find(".color");
 		};
 
 		/**
@@ -259,14 +270,14 @@
 				x2 = fb.square * (0.5 - fb.hsl[1]),
 				y2 = fb.square * (0.5 - fb.hsl[2]);
 
-			$(".h-marker", e).css({
-				left: Math.round(x1 + fb.width / 2) + "px",
-				top: Math.round(y1 + fb.width / 2) + "px"
+			$(".h-marker", e_fb).css({
+				left: Math.round(x1 + options.width / 2) + "px",
+				top: Math.round(y1 + options.width / 2) + "px"
 			});
 
-			$(".sl-marker", e).css({
-				left: Math.round(x2 + fb.width / 2) + "px",
-				top: Math.round(y2 + fb.width / 2) + "px"
+			$(".sl-marker", e_fb).css({
+				left: Math.round(x2 + options.width / 2) + "px",
+				top: Math.round(y2 + options.width / 2) + "px"
 			});
 		};
 
@@ -308,7 +319,10 @@
 		 */
 		fb.widgetCoords = function (event) {
 			var offset = $(fb.wheel).offset();
-			return { x: (event.pageX - offset.left) - fb.width / 2, y: (event.pageY - offset.top) - fb.width / 2 };
+			return {
+				x: (event.pageX - offset.left) - options.width / 2,
+				y: (event.pageY - offset.top) - options.width / 2
+			};
 		};
 
 		/**

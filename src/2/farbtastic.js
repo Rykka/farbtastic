@@ -127,7 +127,13 @@
 	};
 
 	$._farbtastic = function (container, options) {
-		var fb = this;
+		var fb = this,
+			defaults = {
+				callback:	null,
+				version:	2,
+				wheelWidth:	null,
+				width:		300
+			};
 
 		fb.init = function () {
 			// Parse options
@@ -135,11 +141,8 @@
 				options = { callback: options };
 			}
 
-			options = $.extend({
-				width: 300,
-				wheelWidth: (options.width || 300) / 10,
-				callback: null
-			}, options);
+			options = $.extend(true, defaults, options);
+			options.wheelWidth = options.width / 10;
 
 			// Initialize
 			fb.initWidget();
@@ -227,15 +230,28 @@
 				width: options.width,
 				height: options.width
 			};
-			$(container).html(
-				'<div class="farbtastic" style="position: relative">' +
-					'<div class="farbtastic-solid"></div>' +
-					'<canvas class="farbtastic-mask"></canvas>' +
-					'<canvas class="farbtastic-overlay"></canvas>' +
-					'</div>'
-			)
+
+			$(container).html('<div class="farbtastic" style="position: relative">' +
+				'<div class="farbtastic-solid"></div>' +
+				'<canvas class="farbtastic-mask"></canvas>' +
+				'<canvas class="farbtastic-overlay"></canvas>' +
+				'</div>'
+				)
 				.find("*").attr(dim).css(dim).end()
 				.find("div>*").css("position", "absolute");
+
+			// Determine layout
+			fb.radius = (options.width - options.wheelWidth) / 2 - 1;
+			fb.square = Math.floor((fb.radius - options.wheelWidth / 2) * 0.7) - 1;
+			fb.mid = Math.floor(options.width / 2);
+			fb.markerSize = options.wheelWidth * 0.3;
+
+			fb.solidFill = $(container).find(".farbtastic-solid").css({
+				width: fb.square * 2 - 1,
+				height: fb.square * 2 - 1,
+				left: fb.mid - fb.square,
+				top: fb.mid - fb.square
+			});
 
 			// IE Fix: Recreate canvas elements with doc.createElement and excanvas
 			if ($.browser.msie) {
@@ -256,19 +272,6 @@
 						.find("*").attr(dim).css(dim);
 				});
 			}
-
-			// Determine layout
-			fb.radius = (options.width - options.wheelWidth) / 2 - 1;
-			fb.square = Math.floor((fb.radius - options.wheelWidth / 2) * 0.7) - 1;
-			fb.mid = Math.floor(options.width / 2);
-			fb.markerSize = options.wheelWidth * 0.3;
-
-			fb.solidFill = $(container).find(".farbtastic-solid").css({
-				width: fb.square * 2 - 1,
-				height: fb.square * 2 - 1,
-				left: fb.mid - fb.square,
-				top: fb.mid - fb.square
-			});
 
 			// Set up drawing context
 			fb.cnvMask = $(".farbtastic-mask", container);
@@ -304,6 +307,7 @@
 			m.save();
 			m.lineWidth = w / r;
 			m.scale(r, r);
+
 			// Each segment goes from angle1 to angle2
 			for (i = 0; i <= n; ++i) {
 				d2 = i / n;
