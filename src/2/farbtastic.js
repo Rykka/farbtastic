@@ -30,6 +30,10 @@
 
 	/* Various color utility functions */
 	$.ColorUtilities = {
+		defaults: {
+			color: "#000000"
+		},
+
 		dec2hex: function (x) {
 			return (x < 16 ? "0" : "") + x.toString(16);
 		},
@@ -46,18 +50,26 @@
 			return "#" + this.dec2hex(r) + this.dec2hex(g) + this.dec2hex(b);
 		},
 
-		unpack: function (color) {
-			if (color.length === 7) {
-				function x(i) {
-					return parseInt(color.substring(i, i + 2), 16) / 255;
-				}
-				return [ x(1), x(3), x(5) ];
-			} else if (color.length === 4) {
-				function x(i) {
-					return parseInt(color.substring(i, i + 1), 16) / 15;
-				}
-				return [ x(1), x(2), x(3) ];
+		unpack: function (color, defaultColor) {
+			function longForm(color, i) {
+				return parseInt(color.substring(i, i + 2), 16) / 255;
 			}
+
+			function shortForm(color, i) {
+				return parseInt(color.substring(i, i + 1), 16) / 15;
+			}
+			
+			if (color.length === 7) {
+				return [ longForm(color, 1), longForm(color, 3), longForm(color, 5) ];
+			} else if (color.length === 4) {
+				return [ shortForm(color, 1), shortForm(color, 2), shortForm(color, 3) ];
+			}
+
+			if (!defaultColor) {
+				defaultColor = this.defaults.color;
+			}
+
+			return [ longForm(defaultColor, 1), longForm(defaultColor, 3), longForm(defaultColor, 5) ];
 		},
 
 		HSLToRGB: function (hsl) {
@@ -190,7 +202,7 @@
 		 * Change color with HTML syntax #123456
 		 */
 		fb.setColor = function (color) {
-			var unpack = $.ColorUtilities.unpack(color);
+			var unpack = $.ColorUtilities.unpack(color, options.color);
 
 			if (fb.color !== color && unpack) {
 				fb.color = color;
@@ -544,6 +556,10 @@
 		fb.mousemove = function (event) {
 			// Get coordinates relative to color picker center
 			var pos = fb.widgetCoords(event), hue, sat, lum;
+
+			if (!fb.hsl) {
+				return false;
+			}
 
 			// Set new HSL parameters
 			if (fb.circleDrag) {
