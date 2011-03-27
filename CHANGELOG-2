@@ -3,8 +3,10 @@ Changelog
 
 ### unreleased
 
-* IE fixes
-* Refactoring
+* IE fixes - ryleyb
+* $.ColorUtilities object isolated from Farbtastic core and can be reused in
+  other projects - frost-nzcr4
+* Refactoring - frost-nzcr4
 
 ### 2.0a
 

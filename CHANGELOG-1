@@ -3,7 +3,9 @@ Changelog
 
 ### unreleased
 
-* Refactoring
+* $.ColorUtilities object isolated from Farbtastic core and can be reused in
+  other projects - frost-nzcr4
+* Refactoring - frost-nzcr4
 
 ### 1.3u (unofficial) - 2010/2/17
 
