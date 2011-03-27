@@ -121,6 +121,7 @@
 		var fb = this,
 			defaults = {
 				callback:		null,
+				color:			"#808080",
 				usingExCanvas:	false,
 				version:		2,
 				wheelWidth:		null,
@@ -148,12 +149,7 @@
 			if (options.callback) {
 				fb.linkTo(options.callback);
 			}
-
-			// Set to gray
-			fb.setColor("#808080");
 		};
-
-		/////////////////////////////////////////////////////
 
 		/**
 		 * Link to the given element(s) or callback
@@ -176,6 +172,8 @@
 
 				if (fb.callback[0].value) {
 					fb.setColor(fb.callback[0].value);
+				} else {
+					fb.setColor(options.color);
 				}
 			}
 
@@ -193,12 +191,14 @@
 		 */
 		fb.setColor = function (color) {
 			var unpack = $.ColorUtilities.unpack(color);
+
 			if (fb.color !== color && unpack) {
 				fb.color = color;
 				fb.rgb = unpack;
 				fb.hsl = $.ColorUtilities.RGBToHSL(fb.rgb);
 				fb.updateDisplay();
 			}
+
 			return this;
 		};
 

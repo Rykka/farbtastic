@@ -115,9 +115,10 @@
 		// Store farbtastic object
 		var fb = this,
 			defaults = {
-				callback:	null,
-				version:	1,
-				width:		194
+				callback:		null,
+				color:			"#808080",
+				version:		1,
+				width:			194
 			},
 			e_fb,
 			image;
@@ -141,9 +142,6 @@
 			if (options.callback) {
 				fb.linkTo(options.callback);
 			}
-
-			// Set to gray
-			fb.setColor("#808080");
 		};
 
 		/**
@@ -167,6 +165,8 @@
 
 				if (fb.callback[0].value) {
 					fb.setColor(fb.callback[0].value);
+				} else {
+					fb.setColor(options.color);
 				}
 			}
 
@@ -184,12 +184,14 @@
 		 */
 		fb.setColor = function (color) {
 			var unpack = $.ColorUtilities.unpack(color);
+
 			if (fb.color !== color && unpack) {
 				fb.color = color;
 				fb.rgb = unpack;
 				fb.hsl = $.ColorUtilities.RGBToHSL(fb.rgb);
 				fb.updateDisplay();
 			}
+
 			return this;
 		};
 
