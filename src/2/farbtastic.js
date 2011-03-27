@@ -144,6 +144,8 @@
 			options = $.extend(true, defaults, options);
 			options.wheelWidth = options.width / 10;
 
+			fb.usingExCanvas = false;
+
 			// Initialize
 			fb.initWidget();
 
@@ -225,6 +227,21 @@
 		 * Initialize the color picker widget
 		 */
 		fb.initWidget = function () {
+			//excanvas-compatible building of canvases
+			function makeCanvas (className) {
+				var c = document.createElement("canvas");
+
+				if (!c.getContext) { // excanvas hack
+					c = window.G_vmlCanvasManager.initElement(c);
+					c.getContext(); //this creates the excanvas children
+					fb.usingExCanvas = true;
+				}
+
+				$(c).addClass(className);
+
+				return c;
+			};
+
 			// Insert markup and size accordingly
 			var dim = {
 				width: options.width,
@@ -233,10 +250,12 @@
 
 			$(container).html('<div class="farbtastic" style="position: relative">' +
 				'<div class="farbtastic-solid"></div>' +
-				'<canvas class="farbtastic-mask"></canvas>' +
-				'<canvas class="farbtastic-overlay"></canvas>' +
 				'</div>'
 				)
+				.children(".farbtastic")
+				.append(makeCanvas("farbtastic-mask"))
+				.append(makeCanvas("farbtastic-overlay"))
+				.end()
 				.find("*").attr(dim).css(dim).end()
 				.find("div>*").css("position", "absolute");
 
@@ -252,26 +271,6 @@
 				left: fb.mid - fb.square,
 				top: fb.mid - fb.square
 			});
-
-			// IE Fix: Recreate canvas elements with doc.createElement and excanvas
-			if ($.browser.msie) {
-				$("canvas", container).each(function () {
-					// Fetch info
-					var attr = { "class": $(this).attr("class"), style: this.getAttribute("style") },
-						e = document.createElement("canvas");
-					// Replace element
-					$(this).before($(e).attr(attr)).remove();
-
-					// Init with explorerCanvas
-					if (G_vmlCanvasManager) {
-						G_vmlCanvasManager.initElement(e);
-					}
-
-					// Set explorerCanvas elements dimensions and absolute positioning
-					$(e).attr(dim).css(dim).css("position", "absolute")
-						.find("*").attr(dim).css(dim);
-				});
-			}
 
 			// Set up drawing context
 			fb.cnvMask = $(".farbtastic-mask", container);
