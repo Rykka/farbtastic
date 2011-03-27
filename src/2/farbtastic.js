@@ -129,10 +129,11 @@
 	$._farbtastic = function (container, options) {
 		var fb = this,
 			defaults = {
-				callback:	null,
-				version:	2,
-				wheelWidth:	null,
-				width:		300
+				callback:		null,
+				usingExCanvas:	false,
+				version:		2,
+				wheelWidth:		null,
+				width:			300
 			};
 
 		fb.init = function () {
@@ -144,7 +145,7 @@
 			options = $.extend(true, defaults, options);
 			options.wheelWidth = options.width / 10;
 
-			fb.usingExCanvas = false;
+			fb.usingExCanvas = options.usingExCanvas;
 
 			// Initialize
 			fb.initWidget();
@@ -229,17 +230,17 @@
 		fb.initWidget = function () {
 			//excanvas-compatible building of canvases
 			function makeCanvas (className) {
-				var c = document.createElement("canvas");
+				var canvas = document.createElement("canvas");
 
-				if (!c.getContext) { // excanvas hack
-					c = window.G_vmlCanvasManager.initElement(c);
-					c.getContext(); //this creates the excanvas children
+				if (!canvas.getContext) { // excanvas hack
+					canvas = window.G_vmlCanvasManager.initElement(canvas);
+					canvas.getContext(); //this creates the excanvas children
 					fb.usingExCanvas = true;
 				}
 
-				$(c).addClass(className);
+				$(canvas).addClass(className);
 
-				return c;
+				return canvas;
 			};
 
 			// Insert markup and size accordingly
@@ -321,7 +322,7 @@
 				color2 = $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([d2, 1, 0.5]));
 
 				if (i > 0) {
-					if ($.browser.msie) {
+					if (fb.usingExCanvas) {
 						// IE's gradient calculations mess up the colors. Correct along the diagonals
 						corr = (1 + Math.min(Math.abs(Math.tan(angle1)), Math.abs(Math.tan(Math.PI / 2 - angle1)))) / n;
 						color1 = $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([d1 - 0.15 * corr, 1, 0.5]));
@@ -404,7 +405,7 @@
 
 				ctx.putImageData(frame, 0, 0);
 				fb.ctxMask.drawImage(buffer, 0, 0, sz + 1, sz + 1, -sq, -sq, sq * 2, sq * 2);
-			} else if (!$.browser.msie) { // Method #2: drawing commands (old Canvas)
+			} else if (!fb.usingExCanvas) { // Method #2: drawing commands (old Canvas)
 				// Render directly at half-resolution
 				sz = Math.floor(size / 2);
 				calculateMask(sz, sz, function (x, y, c, a) {
