@@ -185,6 +185,8 @@
 				} else {
 					fb.setColor(options.color);
 				}
+			} else {
+				fb.callback = null;
 			}
 
 			return this;
