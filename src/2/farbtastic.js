@@ -20,7 +20,13 @@
  */
 
 (function ($) {
-	var debug = true;
+	var console = window.console ? window.console : {
+			log: $.noop,
+			error: function (msg) {
+				$.error(msg);
+			}
+		},
+		debug = true;
 
 	/* Various color utility functions */
 	$.ColorUtilities = {
@@ -109,21 +115,6 @@
 
 			return [h, s, l];
 		}
-	};
-
-	$.fn.farbtastic = function (options) {
-		$.farbtastic(this, options);
-		return this;
-	};
-
-	$.farbtastic = function (container, options) {
-		container = $(container)[0];
-
-		if (!container.farbtastic) {
-			container.farbtastic = new $._farbtastic(container, options);
-		}
-
-		return container.farbtastic;
 	};
 
 	$._farbtastic = function (container, options) {
@@ -229,7 +220,7 @@
 		 */
 		fb.initWidget = function () {
 			//excanvas-compatible building of canvases
-			function makeCanvas (className) {
+			function makeCanvas(className) {
 				var canvas = document.createElement("canvas");
 
 				if (!canvas.getContext) { // excanvas hack
@@ -241,7 +232,7 @@
 				$(canvas).addClass(className);
 
 				return canvas;
-			};
+			}
 
 			// Insert markup and size accordingly
 			var dim = {
@@ -578,7 +569,7 @@
 
 		if (debug) {
 			var funcsToDebug = ["drawCircle", "drawMask", "initWidget"], i;
-			
+
 			for (i = 0; i < funcsToDebug.length; i += 1) {
 				(function () {
 					var label = funcsToDebug[i], proxied = fb[label];
@@ -595,5 +586,86 @@
 		}
 
 		fb.init();
+	};
+
+	$.farbtastic = {
+		messages: {
+			noObject: "Something goes wrong, check object"
+		},
+
+		init: function (object, options) {
+			if ("object" !== typeof (object) || !object.context) {
+				object = this;
+			}
+
+			if (!object.each || object.length < 1) {
+				console.error($.farbtastic.messages.noObject);
+			}
+
+			var firstObject = null;
+
+			return object.each(function () {
+				// only first object used
+				if (firstObject) {
+					return;
+				}
+
+				firstObject = $(object[0]);
+
+				if (!object.data("farbtastic")) {
+					object.data("farbtastic", new $._farbtastic(object, options));
+				}
+			});
+		},
+
+		linkTo: function (object, callback) {
+			if ("object" !== typeof (object) || !object.context) {
+				object = this;
+			}
+
+			if (!object.each || object.length < 1) {
+				console.error($.farbtastic.messages.noObject);
+			}
+
+			var firstObject = null;
+
+			return object.each(function () {
+				// only first object used
+				if (firstObject) {
+					return;
+				}
+
+				firstObject = $(object[0]);
+
+				if (object.data("farbtastic")) {
+					object.data("farbtastic").linkTo(callback);
+				}
+			});
+		},
+
+		plugin: {
+			exists: function () {
+				return false;
+			}
+		}
+	};
+
+	$.fn.farbtastic = function (method) {
+		var args = arguments, plugin;
+
+		if ("undefined" !== typeof $.farbtastic[method]) {
+			// set argument object to undefined
+			args = Array.prototype.concat.call([args[0]], [undefined], Array.prototype.slice.call(args, 1));
+			return $.farbtastic[method].apply(this, Array.prototype.slice.call(args, 1));
+		} else if ("object" === typeof method || !method) {
+			Array.prototype.unshift.call(args, undefined);
+			return $.farbtastic.init.apply(this, args);
+		} else if ($.farbtastic.plugin.exists(method)) {
+			plugin = $.farbtastic.plugin.parseName(method);
+			args = Array.prototype.concat.call([args[0]], [undefined], Array.prototype.slice.call(args, 1));
+			return $.farbtastic[plugin.name][plugin.method].apply(this, Array.prototype.slice.call(args, 1));
+		} else {
+			console.error("Method '" +  method + "' does not exist on jQuery.farbtastic.\nTry to include some extra controls or plugins");
+		}
 	};
 })(jQuery);
