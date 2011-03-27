@@ -119,9 +119,10 @@ The optional callback argument behaves exactly as for the jQuery method.
 Farbtastic provides the ability to pass in other options beyond a callback.
 The possible options are:
 
-* callback: The callback as described previously.
-* height: The height of the widget.
-* width: The width of the widget.
+* callback: the callback as described previously
+* color: set color at begining
+* height: the height of the widget
+* width: the width of the widget
 
 An example usage would be `$(placeholder).farbtastic({ callback: "#color2", width: 150 })`.
 

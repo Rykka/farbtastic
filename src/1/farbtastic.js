@@ -20,7 +20,13 @@
  */
 
 (function ($) {
-	var debug = true;
+	var console = window.console ? window.console : {
+			log: $.noop,
+			error: function (msg) {
+				$.error(msg);
+			}
+		},
+		debug = true;
 
 	/* Various color utility functions */
 	$.ColorUtilities = {
@@ -112,7 +118,6 @@
 	};
 
 	$._farbtastic = function (container, options) {
-		// Store farbtastic object
 		var fb = this,
 			defaults = {
 				callback:		null,
