@@ -35,7 +35,7 @@ Basic Usage
 
 2) Add a placeholder div and a text field to your HTML, and give each an ID:
 
-    <form><input type="text" id="color" name="color" value="#123456" /></form>
+    <form><input type="text" id="color" name="colorValue" value="#123456" /></form>
     <div id="colorpicker"></div>
 
 3) Add a `ready()` handler to the document which initializes the color picker
@@ -43,19 +43,27 @@ Basic Usage
 
     <script type="text/javascript">
       $(document).ready(function() {
-        $('#colorpicker').farbtastic('#color');
+        $("#colorpicker").farbtastic({callback: "#color");
       });
     </script>
 
-See demo/[version] for an example.
+   or you can use second method:
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $.farbtastic.init($("#colorpicker"), {callback: "#color");
+      });
+    </script>
+
+See `demo/[version]/demo.html` for an example.
 
 Advanced Usage
 --------------
 
 ### jQuery Method
 
-	$(...).farbtastic()
-	$(...).farbtastic(callback)
+	$(placeholder).farbtastic()
+	$(placeholder).farbtastic(callback)
 
 This creates color pickers in the selected objects. `callback` is optional and
 can be a:
@@ -68,14 +76,15 @@ can be a:
 
 ### Object
 
-	$.farbtastic(placeholder)
-	$.farbtastic(placeholder, callback)
+	$.farbtastic.init($(placeholder))
+	$.farbtastic.init($(placeholder), callback)
 
-Invoking `$.farbtastic(placeholder)` is the same as using `$(placeholder).farbtastic()`
-except that the Farbtastic object is returned instead of the jQuery object. This
-allows you to use the Farbtastic methods and properties below.
+Invoking `$.farbtastic.init($(placeholder))` is the same as using `$(placeholder).farbtastic()`.
+After initialization Farbtastic object available through $(placeholder).data("farbtastic").
+This allows you to use the Farbtastic methods and properties below.
+
 **Note** that there is only one Farbtastic object per placeholder. If you call
-`$.farbtastic(placeholder)` twice with the same placeholder, you will get the
+`$.farbtastic.init($(placeholder))` twice with the same placeholder, you will get the
 same object back each time.
 
 The optional callback argument behaves exactly as for the jQuery method.
@@ -101,22 +110,31 @@ The optional callback argument behaves exactly as for the jQuery method.
 
 ### Options
 
-	$(...).farbtastic(options)
-	$.farbtastic(placeholder, options)
+	$(placeholder).farbtastic(options)
 
-Farbtastic 2 provides the ability to pass in other options beyond a callback.
+	or
+
+	$.farbtastic.init($(placeholder), options)
+
+Farbtastic provides the ability to pass in other options beyond a callback.
 The possible options are:
 
 * callback: The callback as described previously.
 * height: The height of the widget.
 * width: The width of the widget.
 
-An example usage would be `$(...).farbtastic({ callback: '#color2', width: 150 })`.
+An example usage would be `$(placeholder).farbtastic({ callback: "#color2", width: 150 })`.
 
 Farbtastic 1: Styling
 ---------------------
 
 The color picker is a block-level element and is 195x195 pixels large. You can
 control the position by styling your placeholder (e.g. floating it).
+
 **Note** that the black/white gradients inside wheel.png and mask.png were generated
 programmatically and cannot be recreated easily in an image editing program.
+
+Tested with
+-----------
+
+jQuery 1.5.1 & Chrome 10, Firefox 4, Opera 11

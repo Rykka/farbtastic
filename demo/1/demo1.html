@@ -7,13 +7,27 @@
 <link rel="stylesheet" type="text/css" href="./../../src/1/farbtastic.css"/>
 <script type="text/javascript">
 $(document).ready(function () {
+	// if jQuery is loaded then hide demo splash
 	$("#demo").hide();
-	$("#picker").farbtastic("#color");
+
+	// initialize object: method 1
+	$("#picker1").farbtastic({callback: "#color1"});
+
+	// initialize object: method 2
+	$.farbtastic.init($("#picker2"), {callback: "#color2"});
+
+	// initialize object: method 3
+	$.farbtastic.init($("#picker3"));
+	$("#picker3").farbtastic("linkTo", "#color3");
+
+	// initialize object: method 4
+	$.farbtastic.init($("#picker4"));
+	$("#picker4").data("farbtastic").linkTo("#color4");
 });
 </script>
 <style type="text/css" media="screen">
 #demo { color: red; font-size: 1.4em; }
-form { width: 400px; }
+.form { width: 400px; }
 </style>
 </head>
 <body>
@@ -21,12 +35,14 @@ form { width: 400px; }
 
 <div id="demo">jQuery.js is not present. You must install jQuery in this folder for the demo to work.</div>
 
-<form action="">
-	<div class="form-item">
-		<label for="color">Color: <input type="text" id="color" name="color" value="#123456"/></label>
-	</div>
-	<div id="picker"></div>
-</form>
+<table>
+	<tr>
+		<td>Color: <input type="text" id="color1" value="#123456"/><div id="picker1"></div></td>
+		<td>Color: <input type="text" id="color2" value=""/><div id="picker2"></div></td>
+		<td>Color: <input type="text" id="color3" value=""/><div id="picker3"></div></td>
+		<td>Color: <input type="text" id="color4" value=""/><div id="picker4"></div></td>
+	</tr>
+</table>
 
 <p>More info available on the <a href="http://code.google.com/p/farbtastic/">Farbtastic Project</a> page.</p>
 <p>Created by <a href="http://www.acko.net/">Steven Wittens</a>.</p>

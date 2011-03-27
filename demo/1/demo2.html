@@ -21,7 +21,9 @@ form { width: 500px; }
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
+	// if jQuery is loaded then hide demo splash
 	$("#demo").hide();
+
 	var f = $.farbtastic("#picker"),
 		p = $("#picker").css("opacity", 0.25),
 		selected;

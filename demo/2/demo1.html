@@ -8,11 +8,22 @@
 <script type="text/javascript" src="./../../src/2/farbtastic.js"></script>
 <script type="text/javascript">
 $(document).ready(function () {
-	$("#colorpicker1").farbtastic("#color1");
-	$("#colorpicker2").farbtastic({
+	// initialize object: method 1
+	$("#colorpicker1").farbtastic({callback: "#color1"});
+
+	// initialize object: method 2
+	$.farbtastic.init($("#colorpicker2"), {
 		callback: "#color2",
 		width: 150
 	});
+
+	// initialize object: method 3
+	$.farbtastic.init($("#colorpicker3"));
+	$("#colorpicker3").farbtastic("linkTo", "#color3");
+
+	// initialize object: method 4
+	$.farbtastic.init($("#colorpicker4"));
+	$("#colorpicker4").data("farbtastic").linkTo("#color4");
 });
 </script>
 <style type="text/css" media="screen">
@@ -35,6 +46,16 @@ p { clear: both; }
 <div class="colorpicker">
 	<div id="colorpicker2"></div>
 	<form><input type="text" id="color2"/></form>
+</div>
+
+<div class="colorpicker">
+	<div id="colorpicker3"></div>
+	<form><input type="text" id="color3"/></form>
+</div>
+
+<div class="colorpicker">
+	<div id="colorpicker4"></div>
+	<form><input type="text" id="color4"/></form>
 </div>
 
 <p><a href="http://acko.net/">Acko.net</a></p>
