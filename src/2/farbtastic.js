@@ -65,7 +65,7 @@
 			// Install touch handlers to simulate appropriate mouse events
 			if ($.support.touch) {
 				element.find(".farbtastic-overlay")
-					.bind("touchstart.farbtastic touchmove.farbtastic touchend.farbtastic touchcancel.farbtastic", fb.touchHandle);
+					.bind("touchstart.farbtastic touchmove.farbtastic touchend.farbtastic touchcancel.farbtastic", $.farbtastic.touchHandle);
 			}
 
 			// Set linked elements/callback
@@ -497,46 +497,6 @@
 			$._farbtastic.dragging = false;
 		};
 
-		/**
-		 * Simulate mouse events for touch devices
-		 */
-		fb.touchHandle = function (event) {
-			var touches = event.originalEvent.changedTouches,
-				firstTouch = touches[0],
-				type = "",
-				simulatedEvent;
-
-			switch (event.type) {
-				case 'touchstart':
-					type = 'mousedown';
-					break;
-				case 'touchmove':
-					type='mousemove';
-					break;
-				case 'touchend':
-					type='mouseup';
-					break;
-				default:
-					return false;
-			}
-
-			// initMouseEvent(
-			//     type, canBubble, cancelable, view, clickCount, 
-			//     screenX, screenY, clientX, clientY, ctrlKey, 
-			//     altKey, shiftKey, metaKey, button, relatedTarget
-			// );
-			simulatedEvent = document.createEvent("MouseEvent");
-			simulatedEvent.initMouseEvent(
-				type, true, true, window, 1, 
-				firstTouch.screenX, firstTouch.screenY, 
-				firstTouch.clientX, firstTouch.clientY, false, 
-				false, false, false, 0 /*left*/, null
-			);
-
-			firstTouch.target.dispatchEvent(simulatedEvent);
-			event.preventDefault();
-		};
-
 		if (debug) {
 			var funcsToDebug = ["drawCircle", "drawMask", "initWidget"], i;
 
@@ -595,6 +555,46 @@
 					object.data("farbtastic").linkTo(callback);
 				}
 			});
+		},
+
+		/**
+		 * Simulate mouse events for touch devices
+		 */
+		touchHandle: function (event) {
+			var touches = event.originalEvent.changedTouches,
+				firstTouch = touches[0],
+				type = "",
+				simulatedEvent;
+
+			switch (event.type) {
+				case "touchstart":
+					type = "mousedown";
+					break;
+				case "touchmove":
+					type = "mousemove";
+					break;
+				case "touchend":
+					type = "mouseup";
+					break;
+				default:
+					return false;
+			}
+
+			// initMouseEvent(
+			//     type, canBubble, cancelable, view, clickCount, 
+			//     screenX, screenY, clientX, clientY, ctrlKey, 
+			//     altKey, shiftKey, metaKey, button, relatedTarget
+			// );
+			simulatedEvent = document.createEvent("MouseEvent");
+			simulatedEvent.initMouseEvent(
+				type, true, true, window, 1, 
+				firstTouch.screenX, firstTouch.screenY, 
+				firstTouch.clientX, firstTouch.clientY, false, 
+				false, false, false, 0 /*left*/, null
+			);
+
+			firstTouch.target.dispatchEvent(simulatedEvent);
+			event.preventDefault();
 		},
 
 		/* Various color utility functions */
