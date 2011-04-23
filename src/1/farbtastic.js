@@ -86,7 +86,9 @@
 		},
 
 		hueToRGB: function (m1, m2, h) {
-			h = (h < 0) ? h + 1 : ((h > 1) ? h - 1 : h);
+//			h = (h < 0) ? h + 1 : ((h > 1) ? h - 1 : h);
+			h = (h + 1) % 1;
+
 			if (h * 6 < 1) {
 				return m1 + (m2 - m1) * h * 6;
 			}
@@ -445,14 +447,6 @@
 		},
 
 		init: function (object, options) {
-			if ("object" !== typeof (object) || !object.context) {
-				object = this;
-			}
-
-			if (!object.each || object.length < 1) {
-				console.error($.farbtastic.messages.noObject);
-			}
-
 			var firstObject = null;
 
 			return object.each(function () {
@@ -470,14 +464,6 @@
 		},
 
 		linkTo: function (object, callback) {
-			if ("object" !== typeof (object) || !object.context) {
-				object = this;
-			}
-
-			if (!object.each || object.length < 1) {
-				console.error($.farbtastic.messages.noObject);
-			}
-
 			var firstObject = null;
 
 			return object.each(function () {
@@ -505,16 +491,15 @@
 		var args = arguments, plugin;
 
 		if ("undefined" !== typeof $.farbtastic[method]) {
-			// set argument object to undefined
-			args = Array.prototype.concat.call([args[0]], [undefined], Array.prototype.slice.call(args, 1));
-			return $.farbtastic[method].apply(this, Array.prototype.slice.call(args, 1));
+			args = Array.prototype.concat.call([args[0]], [this], Array.prototype.slice.call(args, 1));
+			return $.farbtastic[method].apply($.farbtastic, Array.prototype.slice.call(args, 1));
 		} else if ("object" === typeof method || !method) {
-			Array.prototype.unshift.call(args, undefined);
-			return $.farbtastic.init.apply(this, args);
+			Array.prototype.unshift.call(args, this);
+			return $.farbtastic.init.apply($.farbtastic, args);
 		} else if ($.farbtastic.plugin.exists(method)) {
 			plugin = $.farbtastic.plugin.parseName(method);
-			args = Array.prototype.concat.call([args[0]], [undefined], Array.prototype.slice.call(args, 1));
-			return $.farbtastic[plugin.name][plugin.method].apply(this, Array.prototype.slice.call(args, 1));
+			args = Array.prototype.concat.call([args[0]], [this], Array.prototype.slice.call(args, 1));
+			return $.farbtastic[plugin.name][plugin.method].apply($.farbtastic[plugin.name], Array.prototype.slice.call(args, 1));
 		} else {
 			console.error("Method '" +  method + "' does not exist on jQuery.farbtastic.\nTry to include some extra controls or plugins");
 		}
