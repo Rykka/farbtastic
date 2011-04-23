@@ -139,7 +139,7 @@
 				version:		1,
 				width:			194
 			},
-			e_fb,
+			element, // $(div.farbtastic)
 			image;
 
 		fb.init = function () {
@@ -160,11 +160,11 @@
 			fb.initWidget();
 
 			// Install mousedown handler (the others are set on the document on-demand)
-			$("*", e_fb).bind("mousedown.farbtastic", fb.mousedown);
+			element.find("*").bind("mousedown.farbtastic", fb.mousedown);
 
 			// Install touch handlers to simulate appropriate mouse events
 			if ($.support.touch) {
-				$("*", e_fb)
+				element.find("*")
 					.bind("touchstart.farbtastic touchmove.farbtastic touchend.farbtastic touchcancel.farbtastic", fb.touchHandle);
 			}
 
@@ -254,17 +254,18 @@
 				'</div>'
 				);
 
+			element = $(container).find(".farbtastic");
+			
 			// Determine layout
 			fb.radius = 84;
 			fb.square = 100;
 			fb.mid = Math.floor(options.width / 2);
 
-			e_fb = $(".farbtastic", container);
 			fb.wheel = $(".wheel", container)[0];
 
 			// Fix background PNGs in IE6
 			if (navigator.appVersion.match(/MSIE [0-6]\./)) {
-				$("*", e_fb).each(function () {
+				element.find("*").each(function () {
 					if (this.currentStyle.backgroundImage !== "none") {
 						image = this.currentStyle.backgroundImage;
 						image = this.currentStyle.backgroundImage.substring(5, image.length - 2);
@@ -276,7 +277,7 @@
 				});
 			}
 
-			fb.solidFill = e_fb.find(".color");
+			fb.solidFill = element.find(".color");
 		};
 
 		/**
@@ -289,12 +290,12 @@
 				x2 = fb.square * (0.5 - fb.hsl[1]),
 				y2 = fb.square * (0.5 - fb.hsl[2]);
 
-			$(".h-marker", e_fb).css({
+			element.find(".h-marker").css({
 				left: Math.round(x1 + fb.mid) + "px",
 				top: Math.round(y1 + fb.mid) + "px"
 			});
 
-			$(".sl-marker", e_fb).css({
+			element.find(".sl-marker").css({
 				left: Math.round(x2 + fb.mid) + "px",
 				top: Math.round(y2 + fb.mid) + "px"
 			});
@@ -347,9 +348,9 @@
 		 */
 		fb.mousedown = function (event) {
 			// Capture mouse
-			if (!document.dragging) {
+			if (!$._farbtastic.dragging) {
 				$(document).bind("mousemove.farbtastic", fb.mousemove).bind("mouseup.farbtastic", fb.mouseup);
-				document.dragging = true;
+				$._farbtastic.dragging = true;
 			}
 
 			// Update the stored offset for the widget
@@ -395,7 +396,7 @@
 		fb.mouseup = function () {
 			// Uncapture mouse
 			$(document).unbind(".farbtastic");
-			document.dragging = false;
+			$._farbtastic.dragging = false;
 		};
 
 		/**

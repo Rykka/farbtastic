@@ -140,7 +140,8 @@
 				version:		2,
 				wheelWidth:		null,
 				width:			300
-			};
+			},
+			element = null; // $(div.farbtastic)
 
 		fb.init = function () {
 			// Parse options
@@ -162,11 +163,11 @@
 			fb.initWidget();
 
 			// Install mousedown handler (the others are set on the document on-demand)
-			$("canvas.farbtastic-overlay", container).bind("mousedown.farbtastic", fb.mousedown);
+			element.find(".farbtastic-overlay").bind("mousedown.farbtastic", fb.mousedown);
 
 			// Install touch handlers to simulate appropriate mouse events
 			if ($.support.touch) {
-				$("canvas.farbtastic-overlay", container)
+				element.find(".farbtastic-overlay")
 					.bind("touchstart.farbtastic touchmove.farbtastic touchend.farbtastic touchcancel.farbtastic", fb.touchHandle);
 			}
 
@@ -278,13 +279,15 @@
 				.find("*").attr(dim).css(dim).end()
 				.find("div>*").css("position", "absolute");
 
+			element = $(container).find(".farbtastic");
+			
 			// Determine layout
 			fb.radius = (options.width - options.wheelWidth) / 2 - 1;
 			fb.square = Math.floor((fb.radius - options.wheelWidth / 2) * 0.7) - 1;
 			fb.mid = Math.floor(options.width / 2);
 			fb.markerSize = options.wheelWidth * 0.3;
 
-			fb.solidFill = $(container).find(".farbtastic-solid").css({
+			fb.solidFill = element.find(".farbtastic-solid").css({
 				width: fb.square * 2 - 1,
 				height: fb.square * 2 - 1,
 				left: fb.mid - fb.square,
@@ -292,10 +295,9 @@
 			});
 
 			// Set up drawing context
-			fb.cnvMask = $(".farbtastic-mask", container);
+			fb.cnvMask = element.find(".farbtastic-mask");
 			fb.ctxMask = fb.cnvMask[0].getContext("2d");
-			fb.cnvOverlay = $(".farbtastic-overlay", container);
-			fb.ctxOverlay = fb.cnvOverlay[0].getContext("2d");
+			fb.ctxOverlay = element.find(".farbtastic-overlay").get(0).getContext("2d");
 			fb.ctxMask.translate(fb.mid, fb.mid);
 			fb.ctxOverlay.translate(fb.mid, fb.mid);
 
