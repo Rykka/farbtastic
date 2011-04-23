@@ -28,109 +28,6 @@
 		},
 		debug = true;
 
-	/* Various color utility functions */
-	$.ColorUtilities = {
-		defaults: {
-			color: "#000000"
-		},
-
-		dec2hex: function (x) {
-			return (x < 16 ? "0" : "") + x.toString(16);
-		},
-
-		packDX: function (c, a) {
-			return "#" + this.dec2hex(a) + this.dec2hex(c) + this.dec2hex(c) + this.dec2hex(c);
-		},
-
-		pack: function (rgb) {
-			var r = Math.round(rgb[0] * 255),
-				g = Math.round(rgb[1] * 255),
-				b = Math.round(rgb[2] * 255);
-
-			return "#" + this.dec2hex(r) + this.dec2hex(g) + this.dec2hex(b);
-		},
-
-		unpack: function (color, defaultColor) {
-			function longForm(color, i) {
-				return parseInt(color.substring(i, i + 2), 16) / 255;
-			}
-
-			function shortForm(color, i) {
-				return parseInt(color.substring(i, i + 1), 16) / 15;
-			}
-			
-			if (color.length === 7) {
-				return [ longForm(color, 1), longForm(color, 3), longForm(color, 5) ];
-			} else if (color.length === 4) {
-				return [ shortForm(color, 1), shortForm(color, 2), shortForm(color, 3) ];
-			}
-
-			if (!defaultColor) {
-				defaultColor = this.defaults.color;
-			}
-
-			return [ longForm(defaultColor, 1), longForm(defaultColor, 3), longForm(defaultColor, 5) ];
-		},
-
-		HSLToRGB: function (hsl) {
-			var m1, m2, r, g, b,
-				h = hsl[0], s = hsl[1], l = hsl[2];
-
-			m2 = (l <= 0.5) ? l * (s + 1) : l + s - l * s;
-			m1 = l * 2 - m2;
-			return [
-				this.hueToRGB(m1, m2, h + 0.33333),
-				this.hueToRGB(m1, m2, h),
-				this.hueToRGB(m1, m2, h - 0.33333)
-			];
-		},
-
-		hueToRGB: function (m1, m2, h) {
-//			h = (h < 0) ? h + 1 : ((h > 1) ? h - 1 : h);
-			h = (h + 1) % 1;
-
-			if (h * 6 < 1) {
-				return m1 + (m2 - m1) * h * 6;
-			}
-			if (h * 2 < 1) {
-				return m2;
-			}
-			if (h * 3 < 2) {
-				return m1 + (m2 - m1) * (0.66666 - h) * 6;
-			}
-			return m1;
-		},
-
-		RGBToHSL: function (rgb) {
-			var r = rgb[0], g = rgb[1], b = rgb[2],
-				min = Math.min(r, g, b),
-				max = Math.max(r, g, b),
-				delta = max - min,
-				h = 0,
-				s = 0,
-				l = (min + max) / 2;
-
-			if (l > 0 && l < 1) {
-				s = delta / (l < 0.5 ? (2 * l) : (2 - 2 * l));
-			}
-
-			if (delta > 0) {
-				if (max === r && max !== g) {
-					h += (g - b) / delta;
-				}
-				if (max === g && max !== b) {
-					h += (2 + (b - r) / delta);
-				}
-				if (max === b && max !== r) {
-					h += (4 + (r - g) / delta);
-				}
-				h /= 6;
-			}
-
-			return [h, s, l];
-		}
-	};
-
 	$._farbtastic = function (container, options) {
 		var fb = this,
 			defaults = {
@@ -218,12 +115,12 @@
 		 * Change color with HTML syntax #123456
 		 */
 		fb.setColor = function (color) {
-			var unpack = $.ColorUtilities.unpack(color, options.color);
+			var unpack = $.farbtastic.colorUtilities.unpack(color, options.color);
 
 			if (fb.color !== color && unpack) {
 				fb.color = color;
 				fb.rgb = unpack;
-				fb.hsl = $.ColorUtilities.RGBToHSL(fb.rgb);
+				fb.hsl = $.farbtastic.colorUtilities.RGBToHSL(fb.rgb);
 				fb.updateDisplay();
 			}
 
@@ -235,8 +132,8 @@
 		 */
 		fb.setHSL = function (hsl) {
 			fb.hsl = hsl;
-			fb.rgb = $.ColorUtilities.HSLToRGB(hsl);
-			fb.color = $.ColorUtilities.pack(fb.rgb);
+			fb.rgb = $.farbtastic.colorUtilities.HSLToRGB(hsl);
+			fb.color = $.farbtastic.colorUtilities.pack(fb.rgb);
 			fb.updateDisplay();
 			return this;
 		};
@@ -339,14 +236,14 @@
 				tan = 1 / Math.cos((angle2 - angle1) / 2);
 				xm = Math.sin(am) * tan; ym = -Math.cos(am) * tan;
 				// New color
-				color2 = $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([d2, 1, 0.5]));
+				color2 = $.farbtastic.colorUtilities.pack($.farbtastic.colorUtilities.HSLToRGB([d2, 1, 0.5]));
 
 				if (i > 0) {
 					if (fb.usingExCanvas) {
 						// IE's gradient calculations mess up the colors. Correct along the diagonals
 						corr = (1 + Math.min(Math.abs(Math.tan(angle1)), Math.abs(Math.tan(Math.PI / 2 - angle1)))) / n;
-						color1 = $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([d1 - 0.15 * corr, 1, 0.5]));
-						color2 = $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([d2 + 0.15 * corr, 1, 0.5]));
+						color1 = $.farbtastic.colorUtilities.pack($.farbtastic.colorUtilities.HSLToRGB([d1 - 0.15 * corr, 1, 0.5]));
+						color2 = $.farbtastic.colorUtilities.pack($.farbtastic.colorUtilities.HSLToRGB([d2 + 0.15 * corr, 1, 0.5]));
 						// Create gradient fill between the endpoints
 						grad = m.createLinearGradient(x1, y1, x2, y2);
 						grad.addColorStop(0, color1);
@@ -449,8 +346,8 @@
 					if (y > 0) {
 						var c_last = cache_last[x][0],
 							a_last = cache_last[x][1],
-							color1 = $.ColorUtilities.packDX(c_last, a_last),
-							color2 = $.ColorUtilities.packDX(c, a),
+							color1 = $.farbtastic.colorUtilities.packDX(c_last, a_last),
+							color2 = $.farbtastic.colorUtilities.packDX(c, a),
 							y1 = Math.round(fb.mid + ((y - 1) * 0.333 - 1) * sq),
 							y2 = Math.round(fb.mid + (y * 0.333 - 1) * sq);
 						$("<div>").css({
@@ -511,7 +408,7 @@
 			fb.invert = (fb.rgb[0] * 0.3 + fb.rgb[1] * 0.59 + fb.rgb[2] * 0.11) <= 0.6;
 
 			// Update the solid background fill
-			fb.solidFill.css("backgroundColor", $.ColorUtilities.pack($.ColorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
+			fb.solidFill.css("backgroundColor", $.farbtastic.colorUtilities.pack($.farbtastic.colorUtilities.HSLToRGB([fb.hsl[0], 1, 0.5])));
 
 			// Draw markers
 			fb.drawMarkers();
@@ -698,6 +595,109 @@
 					object.data("farbtastic").linkTo(callback);
 				}
 			});
+		},
+
+		/* Various color utility functions */
+		colorUtilities: {
+			defaults: {
+				color: "#000000"
+			},
+
+			dec2hex: function (x) {
+				return (x < 16 ? "0" : "") + x.toString(16);
+			},
+
+			packDX: function (c, a) {
+				return "#" + this.dec2hex(a) + this.dec2hex(c) + this.dec2hex(c) + this.dec2hex(c);
+			},
+
+			pack: function (rgb) {
+				var r = Math.round(rgb[0] * 255),
+					g = Math.round(rgb[1] * 255),
+					b = Math.round(rgb[2] * 255);
+
+				return "#" + this.dec2hex(r) + this.dec2hex(g) + this.dec2hex(b);
+			},
+
+			unpack: function (color, defaultColor) {
+				function longForm(color, i) {
+					return parseInt(color.substring(i, i + 2), 16) / 255;
+				}
+
+				function shortForm(color, i) {
+					return parseInt(color.substring(i, i + 1), 16) / 15;
+				}
+				
+				if (color.length === 7) {
+					return [ longForm(color, 1), longForm(color, 3), longForm(color, 5) ];
+				} else if (color.length === 4) {
+					return [ shortForm(color, 1), shortForm(color, 2), shortForm(color, 3) ];
+				}
+
+				if (!defaultColor) {
+					defaultColor = this.defaults.color;
+				}
+
+				return [ longForm(defaultColor, 1), longForm(defaultColor, 3), longForm(defaultColor, 5) ];
+			},
+
+			HSLToRGB: function (hsl) {
+				var m1, m2, r, g, b,
+					h = hsl[0], s = hsl[1], l = hsl[2];
+
+				m2 = (l <= 0.5) ? l * (s + 1) : l + s - l * s;
+				m1 = l * 2 - m2;
+				return [
+					this.hueToRGB(m1, m2, h + 0.33333),
+					this.hueToRGB(m1, m2, h),
+					this.hueToRGB(m1, m2, h - 0.33333)
+				];
+			},
+
+			hueToRGB: function (m1, m2, h) {
+//				h = (h < 0) ? h + 1 : ((h > 1) ? h - 1 : h);
+				h = (h + 1) % 1;
+
+				if (h * 6 < 1) {
+					return m1 + (m2 - m1) * h * 6;
+				}
+				if (h * 2 < 1) {
+					return m2;
+				}
+				if (h * 3 < 2) {
+					return m1 + (m2 - m1) * (0.66666 - h) * 6;
+				}
+				return m1;
+			},
+
+			RGBToHSL: function (rgb) {
+				var r = rgb[0], g = rgb[1], b = rgb[2],
+					min = Math.min(r, g, b),
+					max = Math.max(r, g, b),
+					delta = max - min,
+					h = 0,
+					s = 0,
+					l = (min + max) / 2;
+
+				if (l > 0 && l < 1) {
+					s = delta / (l < 0.5 ? (2 * l) : (2 - 2 * l));
+				}
+
+				if (delta > 0) {
+					if (max === r && max !== g) {
+						h += (g - b) / delta;
+					}
+					if (max === g && max !== b) {
+						h += (2 + (b - r) / delta);
+					}
+					if (max === b && max !== r) {
+						h += (4 + (r - g) / delta);
+					}
+					h /= 6;
+				}
+
+				return [h, s, l];
+			}
 		},
 
 		plugin: {
