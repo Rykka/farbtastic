@@ -49,6 +49,8 @@
 			options = $.extend(true, defaults, options);
 			options.wheelWidth = options.width / 10;
 
+			fb.options2 = options;
+			
 			// Touch support
 			$.extend($.support, {
 				touch: (typeof Touch === "object")
@@ -70,75 +72,9 @@
 
 			// Set linked elements/callback
 			if (options.callback) {
-				fb.linkTo(options.callback);
+				$.farbtastic.linkTo_(fb, options.callback);
 			}
 		};
-
-		/**
-		 * Link to the given element(s) or callback
-		 */
-		fb.linkTo = function (callback) {
-			// Unbind previous nodes
-			if (typeof fb.callback === "object") {
-				$(fb.callback).unbind("keyup.farbtastic", fb.updateValue);
-			}
-
-			// Reset color
-			fb.color = null;
-
-			// Bind callback or elements
-			if (typeof callback === "function") {
-				fb.callback = callback;
-			} else if (typeof callback === "object" || typeof callback === "string") {
-				fb.callback = $(callback);
-				fb.callback.bind("keyup.farbtastic", fb.updateValue);
-
-				if (fb.callback[0].value) {
-					fb.setColor(fb.callback[0].value);
-				} else {
-					fb.setColor(options.color);
-				}
-			} else {
-				fb.callback = null;
-			}
-
-			return this;
-		};
-
-		fb.updateValue = function (event) {
-			if (this.value && this.value !== fb.color) {
-				fb.setColor(this.value);
-			}
-		};
-
-		/**
-		 * Change color with HTML syntax #123456
-		 */
-		fb.setColor = function (color) {
-			var unpack = $.farbtastic.colorUtilities.unpack(color, options.color);
-
-			if (fb.color !== color && unpack) {
-				fb.color = color;
-				fb.rgb = unpack;
-				fb.hsl = $.farbtastic.colorUtilities.RGBToHSL(fb.rgb);
-				fb.updateDisplay();
-			}
-
-			return this;
-		};
-
-		/**
-		 * Change color with HSL triplet [0..1, 0..1, 0..1]
-		 */
-		fb.setHSL = function (hsl) {
-			fb.hsl = hsl;
-			fb.rgb = $.farbtastic.colorUtilities.HSLToRGB(hsl);
-			fb.color = $.farbtastic.colorUtilities.pack(fb.rgb);
-			fb.updateDisplay();
-			return this;
-		};
-
-		/////////////////////////////////////////////////////
 
 		/**
 		 * Initialize the color picker widget
@@ -478,11 +414,11 @@
 			// Set new HSL parameters
 			if (fb.circleDrag) {
 				hue = Math.atan2(pos.x, -pos.y) / 6.28;
-				fb.setHSL([(hue + 1) % 1, fb.hsl[1], fb.hsl[2]]);
+				$.farbtastic.setHsl(fb, [(hue + 1) % 1, fb.hsl[1], fb.hsl[2]]);
 			} else {
 				sat = Math.max(0, Math.min(1, -(pos.x / fb.square / 2) + 0.5));
 				lum = Math.max(0, Math.min(1, -(pos.y / fb.square / 2) + 0.5));
-				fb.setHSL([fb.hsl[0], sat, lum]);
+				$.farbtastic.setHsl(fb, [fb.hsl[0], sat, lum]);
 			}
 
 			return false;
@@ -540,6 +476,80 @@
 			});
 		},
 
+		/**
+		 * Change color with HTML syntax #123456
+		 */
+		setColor: function (fbInstance, color) {
+			var unpack = $.farbtastic.colorUtilities.unpack(color, fbInstance.options2.color);
+
+			if (fbInstance.color !== color && unpack) {
+				fbInstance.color = color;
+				fbInstance.rgb = unpack;
+				fbInstance.hsl = $.farbtastic.colorUtilities.RGBToHSL(fbInstance.rgb);
+				fbInstance.updateDisplay();
+			}
+
+			return this;
+		},
+
+		/**
+		 * Change color with HSL triplet [0..1, 0..1, 0..1]
+		 */
+		setHsl: function (fbInstance, hsl) {
+			fbInstance.hsl = hsl;
+			fbInstance.rgb = $.farbtastic.colorUtilities.HSLToRGB(hsl);
+			fbInstance.color = $.farbtastic.colorUtilities.pack(fbInstance.rgb);
+			fbInstance.updateDisplay();
+
+			return this;
+		},
+		
+		updateValue: function (fbInstance, linkedTo, event) {
+			if (linkedTo.value && linkedTo.value !== fbInstance.color) {
+				$.farbtastic.setColor(fbInstance, linkedTo.value);
+			}
+		},
+
+		/**
+		 * Link to the given element(s) or callback
+		 * 
+		 * @private
+		 */
+		linkTo_: function (fbInstance, callback) {
+			// Unbind previous nodes
+			if (typeof fbInstance.callback === "object") {
+				$(fbInstance.callback).unbind("keyup.farbtastic", function (event) {
+					$.farbtastic.updateValue(fbInstance, this, event);
+				});
+			}
+
+			// Reset color
+			fbInstance.color = null;
+
+			// Bind callback or elements
+			if (typeof callback === "function") {
+				fbInstance.callback = callback;
+			} else if (typeof callback === "object" || typeof callback === "string") {
+				fbInstance.callback = $(callback);
+				fbInstance.callback.bind("keyup.farbtastic", function (event) {
+					$.farbtastic.updateValue(fbInstance, this, event);
+				});
+
+				if (fbInstance.callback[0].value) {
+					$.farbtastic.setColor(fbInstance, fbInstance.callback[0].value);
+				} else {
+					$.farbtastic.setColor(fbInstance, fbInstance.options2.color);
+				}
+			} else {
+				fbInstance.callback = null;
+			}
+
+			return this;
+		},
+
+		/**
+		 * jQuery layer
+		 */
 		linkTo: function (object, callback) {
 			var firstObject = null;
 
@@ -552,7 +562,7 @@
 				firstObject = $(object[0]);
 
 				if (object.data("farbtastic")) {
-					object.data("farbtastic").linkTo(callback);
+					$.farbtastic.linkTo_(object.data("farbtastic"), callback);
 				}
 			});
 		},
