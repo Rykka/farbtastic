@@ -91,7 +91,7 @@
 			
 			// Determine layout
 			fb.radius = 84;
-			fb.square = 100;
+			fb.square = Math.floor(100 / 2);
 			fb.mid = Math.floor(options.width / 2);
 
 			fb.wheel = $(".wheel", container)[0];
@@ -120,8 +120,8 @@
 			var angle = fb.hsl[0] * 6.28,
 				x1 =  Math.sin(angle) * fb.radius,
 				y1 = -Math.cos(angle) * fb.radius,
-				x2 = fb.square * (0.5 - fb.hsl[1]),
-				y2 = fb.square * (0.5 - fb.hsl[2]);
+				x2 = 2 * fb.square * (0.5 - fb.hsl[1]),
+				y2 = 2 * fb.square * (0.5 - fb.hsl[2]);
 
 			element.find(".h-marker").css({
 				left: Math.round(x1 + fb.mid) + "px",
@@ -181,7 +181,7 @@
 
 			// Check which area is being dragged
 			var pos = $.farbtastic.widgetCoords(fb, event);
-			fb.circleDrag = Math.max(Math.abs(pos.x), Math.abs(pos.y)) * 2 > fb.square;
+			fb.circleDrag = Math.max(Math.abs(pos.x), Math.abs(pos.y)) > (fb.square + 2);
 
 			// Process
 			fb.mousemove(event);
@@ -205,8 +205,8 @@
 				if (hue < 0) { hue += 1; }
 				$.farbtastic.setHsl(fb, [hue, fb.hsl[1], fb.hsl[2]]);
 			} else {
-				sat = Math.max(0, Math.min(1, -(pos.x / fb.square) + 0.5));
-				lum = Math.max(0, Math.min(1, -(pos.y / fb.square) + 0.5));
+				sat = Math.max(0, Math.min(1, -(pos.x / fb.square / 2) + 0.5));
+				lum = Math.max(0, Math.min(1, -(pos.y / fb.square / 2) + 0.5));
 				$.farbtastic.setHsl(fb, [fb.hsl[0], sat, lum]);
 			}
 
