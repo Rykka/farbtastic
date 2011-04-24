@@ -369,30 +369,20 @@
 		};
 
 		/**
-		 * Helper for returning coordinates relative to the center
-		 */
-		fb.widgetCoords = function (event) {
-			return {
-				x: event.pageX - fb.offset.left - fb.mid,
-				y: event.pageY - fb.offset.top - fb.mid
-			};
-		};
-
-		/**
 		 * Mousedown handler
 		 */
 		fb.mousedown = function (event) {
 			// Capture mouse
-			if (!$._farbtastic.dragging) {
-				$(document).bind("mousemove.farbtastic", fb.mousemove).bind("mouseup.farbtastic", fb.mouseup);
-				$._farbtastic.dragging = true;
+			if (!$.farbtastic.dragging) {
+				$(document).bind("mousemove.farbtastic", fb.mousemove).bind("mouseup.farbtastic", $.farbtastic.mouseup);
+				$.farbtastic.dragging = true;
 			}
 
 			// Update the stored offset for the widget
 			fb.offset = $(container).offset();
 
 			// Check which area is being dragged
-			var pos = fb.widgetCoords(event);
+			var pos = $.farbtastic.widgetCoords(fb, event);
 			fb.circleDrag = Math.max(Math.abs(pos.x), Math.abs(pos.y)) > (fb.square + 2);
 
 			// Process
@@ -405,7 +395,7 @@
 		 */
 		fb.mousemove = function (event) {
 			// Get coordinates relative to color picker center
-			var pos = fb.widgetCoords(event), hue, sat, lum;
+			var pos = $.farbtastic.widgetCoords(fb, event), hue, sat, lum;
 
 			if (!fb.hsl) {
 				return false;
@@ -422,15 +412,6 @@
 			}
 
 			return false;
-		};
-
-		/**
-		 * Mouseup handler
-		 */
-		fb.mouseup = function () {
-			// Uncapture mouse
-			$(document).unbind(".farbtastic");
-			$._farbtastic.dragging = false;
 		};
 
 		if (debug) {
@@ -455,6 +436,8 @@
 	};
 
 	$.farbtastic = {
+		dragging: false,
+
 		messages: {
 			noObject: "Something goes wrong, check object"
 		},
@@ -474,6 +457,12 @@
 					object.data("farbtastic", new $._farbtastic(object, options));
 				}
 			});
+		},
+
+		mouseup: function () {
+			// Uncapture mouse
+			$(document).unbind(".farbtastic");
+			$.farbtastic.dragging = false;
 		},
 
 		/**
@@ -508,6 +497,16 @@
 			if (linkedTo.value && linkedTo.value !== fbInstance.color) {
 				$.farbtastic.setColor(fbInstance, linkedTo.value);
 			}
+		},
+
+		/**
+		 * Helper for returning coordinates relative to the center
+		 */
+		widgetCoords: function (fbInstance, event) {
+			return {
+				x: event.pageX - fbInstance.offset.left - fbInstance.mid,
+				y: event.pageY - fbInstance.offset.top - fbInstance.mid
+			};
 		},
 
 		/**
