@@ -341,6 +341,7 @@
 		 */
 		fb.updateDisplay = function () {
 			// Determine whether labels/markers should invert
+			// :old: fb.invert = fb.hsl[2] <= 0.5;
 			fb.invert = (fb.rgb[0] * 0.3 + fb.rgb[1] * 0.59 + fb.rgb[2] * 0.11) <= 0.6;
 
 			// Update the solid background fill
@@ -379,7 +380,8 @@
 			}
 
 			// Update the stored offset for the widget
-			fb.offset = $(container).offset();
+			fb.offset = element.offset();
+//			fb.offset = $(container).offset();
 
 			// Check which area is being dragged
 			var pos = $.farbtastic.widgetCoords(fb, event);
