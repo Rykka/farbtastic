@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<title>Farbtastic Mobile</title>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+	<!--[if lte IE 8]><script type="text/javascript" src="http://explorercanvas.googlecode.com/svn/tags/m3/excanvas.compiled.js"></script><![endif]-->
+	<script type="text/javascript" src="./../../src/2/farbtastic.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function () {
+		// initialize object: method 1
+		$("#colorpicker1").farbtastic({callback: "#color1"});
+		
+		// initialize object: method 2
+		$.farbtastic.init($("#colorpicker2"), {
+			callback: "#color2",
+			width: 194
+		});
+		
+		// initialize object: method 3
+		$.farbtastic.init($("#colorpicker3"));
+		$("#colorpicker3").farbtastic("linkTo", "#color3");
+		
+		// initialize object: method 4
+		$.farbtastic.init($("#colorpicker4"));
+		$.farbtastic.linkTo($("#colorpicker4"), "#color4");
+	});
+</script>
+<style type="text/css" media="screen">
+	.colorpicker { float: left; margin: 1em 1em 0 0; }
+	form { margin: 2em 1em 0px 1px; text-align: center; }
+	p { clear: both; }
+</style>
+</head>
+<body>
+	<div data-role="header" data-position="inline">
+		<h1>Farbtastic Mobile</h1>
+	</div>
+	<div class="ui-body ui-body-a">
+		<h2>jQuery Mobile implementation of Farbtastic 2. Canvas/JS.</h2>
+		<h3>Note: this is an alpha version, not suitable for use in production apps.</h3>
+		
+		<div class="colorpicker">
+			<div id="colorpicker1"></div>
+			<form><input type="text" id="color1" value=""/></form>
+		</div>
+		
+		<div class="colorpicker">
+			<div id="colorpicker2"></div>
+			<form><input type="text" id="color2" value="#WhenColorIsNotAvailable"/></form>
+		</div>
+		
+		<div class="colorpicker">
+			<div id="colorpicker3"></div>
+			<form><input type="text" id="color3" value=""/></form>
+		</div>
+		
+		<div class="colorpicker">
+			<div id="colorpicker4"></div>
+			<form><input type="text" id="color4" value="#WhenColorIsNotAvailable"/></form>
+		</div>
+		
+		<p><a href="http://acko.net/">Acko.net</a></p>
+	</div>
+</body>
+</html>
